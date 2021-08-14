@@ -300,8 +300,8 @@ def runClassifier(args, options):
     rawTestData = samples.loadDataFile("data/facedata/facedatatest", numTest,FACE_DATUM_WIDTH,FACE_DATUM_HEIGHT)
     testLabels = samples.loadLabelsFile("data/facedata/facedatatestlabels", numTest)
   else:
-    rawTrainingData = samples.loadDataFile("data/digitdata/trainingimages", numTraining,DIGIT_DATUM_WIDTH,DIGIT_DATUM_HEIGHT)
-    trainingLabels = samples.loadLabelsFile("data/digitdata/traininglabels", numTraining)
+    rawTrainingData = samples.loadDataFile("data/digitdata/trainingimages", numTraining,DIGIT_DATUM_WIDTH,DIGIT_DATUM_HEIGHT) # number image
+    trainingLabels = samples.loadLabelsFile("data/digitdata/traininglabels", numTraining) # The actual number
     rawValidationData = samples.loadDataFile("data/digitdata/validationimages", numTest,DIGIT_DATUM_WIDTH,DIGIT_DATUM_HEIGHT)
     validationLabels = samples.loadLabelsFile("data/digitdata/validationlabels", numTest)
     rawTestData = samples.loadDataFile("data/digitdata/testimages", numTest,DIGIT_DATUM_WIDTH,DIGIT_DATUM_HEIGHT)
@@ -310,7 +310,7 @@ def runClassifier(args, options):
   
   # Extract features
   print "Extracting features..."
-  trainingData = map(featureFunction, rawTrainingData)
+  trainingData = map(featureFunction, rawTrainingData) # Feature function is applied over each training data. Resultant is 
   validationData = map(featureFunction, rawValidationData)
   testData = map(featureFunction, rawTestData)
   

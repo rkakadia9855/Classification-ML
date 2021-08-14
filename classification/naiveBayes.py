@@ -61,7 +61,61 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     """
 
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+
+    priorDistributor = util.Counter() # prior distribution of labels
+    featureConditionalProb = util.Counter() # Conidtional probability of a feature = 1 for a label
+    featureCounterY = util.Counter() # counts individual feature for a label y
+
+    for i in range(len(trainingData)):
+      datum = trainingData[i]
+      label = trainingLabels[i]
+      priorDistributor[label] += 1 # increase the counter of a label
+      for feature, val in datum.items():
+        featureCounterY[(feature,label)] += 1 # If a particular feature appears, increase its counter regardless of feature value
+        if val > 0: 
+          featureConditionalProb[(feature, label)] += 1 # Now increase its count in conditional probability if its val = 1 or 2
+
+    # Prepare prior dictionary to calculate the log(P(y))
+    self.prior = util.Counter()
+    for key, val in priorDistributor.items():
+      self.prior[key] += val
+    # Convert prior distribution in terms of log
+    for key in self.prior:
+      self.prior[key] = math.log(self.prior[key])
+
+    mostAccurateK = -1 # keeps track of which k value produced most accurate results
+    # The loop below estimates P(Fi = fi | Y = y) and applies smoothing to it (According to berkeley documentation)
+    for k in kgrid: 
+      featureEqualsOne = util.Counter() # c(fi, y)+k
+      totalFeatureCount = util.Counter() # Summation(c(!fi, y)+k)
+
+      # Get the values for proceeding to the step where we estimate P(fi | y)
+      for key, val in featureCounterY.items():
+        totalFeatureCount[key] += val
+      for key, val in featureConditionalProb.items():
+        featureEqualsOne[key] += val
+
+      # Add k to smooth the values
+      for label in self.legalLabels:
+        for feature in self.features:
+          featureEqualsOne[ (feature, label)] +=  k
+          totalFeatureCount[(feature, label)] +=  2*k 
+
+      # Time to finally calculate P(fi | y)
+      for x, count in featureEqualsOne.items():
+        featureEqualsOne[x] = float(count) / float(totalFeatureCount[x])
+
+      self.finalConditionalProbability = featureEqualsOne
+
+      # This is for autotune. It keeps track of which k value produced best accuracy
+      predictions = self.classify(validationData)
+      accuracyScore =  [predictions[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
+      bestParams = (featureEqualsOne, k) if accuracyScore > mostAccurateK else bestParams
+      mostAccurateK = accuracyScore if accuracyScore > mostAccurateK else mostAccurateK
+
+    self.finalConditionalProbability, self.k = bestParams
+    
+    
         
   def classify(self, testData):
     """
@@ -89,8 +143,16 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     logJoint = util.Counter()
     
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
-    
+
+    for label in self.legalLabels:
+      logJoint[label] = self.prior[label]
+      for feature, value in datum.items():
+        # Calculating {log(P(y) + Sum(log(P(fi | y))))}
+        if value != 0:
+          logJoint[label] += math.log(self.finalConditionalProbability[feature,label])
+        else:
+          logJoint[label] += math.log(1-self.finalConditionalProbability[feature,label])
+          
     return logJoint
   
   def findHighOddsFeatures(self, label1, label2):
@@ -106,7 +168,3 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
     util.raiseNotDefined()
 
     return featuresOdds
-    
-
-    
-      
