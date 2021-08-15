@@ -16,6 +16,9 @@ import mira
 import samples
 import sys
 import util
+import random
+import time
+import numpy
 
 TEST_SET_SIZE = 100
 DIGIT_DATUM_WIDTH=28
@@ -318,172 +321,263 @@ def runClassifier(args, options):
   testData = map(featureFunction, rawTestData)
 
   # Conduct training and testing
-  print "Training 10%"
-  newLength = int(0.1 * len(trainingData))
-  slicedTrainingData = trainingData[0:newLength]
-  slicedTrainingLabels = trainingLabels[0:newLength]
-  slicedValidationData = validationData[0:newLength]
-  slicedValidationLabels = validationLabels[0:newLength]
-  classifier.train(slicedTrainingData, slicedTrainingLabels, slicedValidationData, slicedValidationLabels)
-  print "Validating 10%"
-  guesses = classifier.classify(slicedValidationData)
-  correct = [guesses[i] == slicedValidationLabels[i] for i in range(len(slicedValidationLabels))].count(True)
-  print str(correct), ("correct out of " + str(len(slicedValidationLabels)) + " (%.1f%%).") % (100.0 * correct / len(slicedValidationLabels))
-  print "Testing..."
-  guesses = classifier.classify(testData)
-  correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
-  print str(correct), ("correct out of " + str(len(testLabels)) + " (%.1f%%).") % (100.0 * correct / len(testLabels))
-  analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  print "Training the dataset using 10 percent of the random data"
+  acc = [0,0,0,0,0]
+  trainingTime = [0,0,0,0,0]
+  for itr in range(1,6):
+    print "Iteration number",itr
+    newLength = int(0.1 * len(trainingData))
+    slicedTrainingData, slicedTrainingLabels = zip(*random.sample(list(zip(trainingData, trainingLabels)), newLength))
+    start = time.time()
+    classifier.train(slicedTrainingData, slicedTrainingLabels, validationData, validationLabels)
+    end = time.time()
+    trainingTime[itr-1] = end-start
+    print "Validating..."
+    guesses = classifier.classify(validationData)
+    correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
+    print "Testing..."
+    guesses = classifier.classify(testData)
+    correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
+    acc[itr-1] = correct
+    #analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  avgTime = float(sum(trainingTime)/len(trainingTime))
+  print "It took an average of",avgTime,"to train the algorithm with 10 percent data"
+  mean = float(sum(acc)/len(acc))
+  standardDev = numpy.std(acc)
+  print "The average prediction score is",mean,"%"
+  print "The standard deviation is",standardDev
 
-  print "Training 20%"
-  newLength = int(0.2 * len(trainingData))
-  slicedTrainingData = trainingData[0:newLength]
-  slicedTrainingLabels = trainingLabels[0:newLength]
-  slicedValidationData = validationData[0:newLength]
-  slicedValidationLabels = validationLabels[0:newLength]
-  classifier.train(slicedTrainingData, slicedTrainingLabels, slicedValidationData, slicedValidationLabels)
-  print "Validating 20%"
-  guesses = classifier.classify(slicedValidationData)
-  correct = [guesses[i] == slicedValidationLabels[i] for i in range(len(slicedValidationLabels))].count(True)
-  print str(correct), ("correct out of " + str(len(slicedValidationLabels)) + " (%.1f%%).") % (100.0 * correct / len(slicedValidationLabels))
-  print "Testing..."
-  guesses = classifier.classify(testData)
-  correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
-  print str(correct), ("correct out of " + str(len(testLabels)) + " (%.1f%%).") % (100.0 * correct / len(testLabels))
-  analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  print "Training the dataset using 20 percent of the random data"
+  acc = [0,0,0,0,0]
+  trainingTime = [0,0,0,0,0]
+  for itr in range(1,6):
+    print "Iteration number",itr
+    newLength = int(0.2 * len(trainingData))
+    slicedTrainingData, slicedTrainingLabels = zip(*random.sample(list(zip(trainingData, trainingLabels)), newLength))
+    start = time.time()
+    classifier.train(slicedTrainingData, slicedTrainingLabels, validationData, validationLabels)
+    end = time.time()
+    trainingTime[itr-1] = end-start
+    print "Validating..."
+    guesses = classifier.classify(validationData)
+    correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
+    print "Testing..."
+    guesses = classifier.classify(testData)
+    correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
+    acc[itr-1] = correct
+    #analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  avgTime = float(sum(trainingTime)/len(trainingTime))
+  print "It took an average of",avgTime,"to train the algorithm with 20 percent data"
+  mean = float(sum(acc)/len(acc))
+  standardDev = numpy.std(acc)
+  print "The average prediction score is",mean,"%"
+  print "The standard deviation is",standardDev
 
-  print "Training 30%"
-  newLength = int(0.3 * len(trainingData))
-  slicedTrainingData = trainingData[0:newLength]
-  slicedTrainingLabels = trainingLabels[0:newLength]
-  slicedValidationData = validationData[0:newLength]
-  slicedValidationLabels = validationLabels[0:newLength]
-  classifier.train(slicedTrainingData, slicedTrainingLabels, slicedValidationData, slicedValidationLabels)
-  print "Validating 30%"
-  guesses = classifier.classify(slicedValidationData)
-  correct = [guesses[i] == slicedValidationLabels[i] for i in range(len(slicedValidationLabels))].count(True)
-  print str(correct), ("correct out of " + str(len(slicedValidationLabels)) + " (%.1f%%).") % (100.0 * correct / len(slicedValidationLabels))
-  print "Testing..."
-  guesses = classifier.classify(testData)
-  correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
-  print str(correct), ("correct out of " + str(len(testLabels)) + " (%.1f%%).") % (100.0 * correct / len(testLabels))
-  analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  print "Training the dataset using 30 percent of the random data"
+  acc = [0,0,0,0,0]
+  trainingTime = [0,0,0,0,0]
+  for itr in range(1,6):
+    print "Iteration number",itr
+    newLength = int(0.3 * len(trainingData))
+    slicedTrainingData, slicedTrainingLabels = zip(*random.sample(list(zip(trainingData, trainingLabels)), newLength))
+    start = time.time()
+    classifier.train(slicedTrainingData, slicedTrainingLabels, validationData, validationLabels)
+    end = time.time()
+    trainingTime[itr-1] = end-start
+    print "Validating..."
+    guesses = classifier.classify(validationData)
+    correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
+    print "Testing..."
+    guesses = classifier.classify(testData)
+    correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
+    acc[itr-1] = correct
+    #analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  avgTime = float(sum(trainingTime)/len(trainingTime))
+  print "It took an average of",avgTime,"to train the algorithm with 30 percent data"
+  mean = float(sum(acc)/len(acc))
+  standardDev = numpy.std(acc)
+  print "The average prediction score is",mean,"%"
+  print "The standard deviation is",standardDev
 
-  print "Training 40%"
-  newLength = int(0.4 * len(trainingData))
-  slicedTrainingData = trainingData[0:newLength]
-  slicedTrainingLabels = trainingLabels[0:newLength]
-  slicedValidationData = validationData[0:newLength]
-  slicedValidationLabels = validationLabels[0:newLength]
-  classifier.train(slicedTrainingData, slicedTrainingLabels, slicedValidationData, slicedValidationLabels)
-  print "Validating 40%"
-  guesses = classifier.classify(slicedValidationData)
-  correct = [guesses[i] == slicedValidationLabels[i] for i in range(len(slicedValidationLabels))].count(True)
-  print str(correct), ("correct out of " + str(len(slicedValidationLabels)) + " (%.1f%%).") % (100.0 * correct / len(slicedValidationLabels))
-  print "Testing..."
-  guesses = classifier.classify(testData)
-  correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
-  print str(correct), ("correct out of " + str(len(testLabels)) + " (%.1f%%).") % (100.0 * correct / len(testLabels))
-  analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  print "Training the dataset using 40 percent of the random data"
+  acc = [0,0,0,0,0]
+  trainingTime = [0,0,0,0,0]
+  for itr in range(1,6):
+    print "Iteration number",itr
+    newLength = int(0.4 * len(trainingData))
+    slicedTrainingData, slicedTrainingLabels = zip(*random.sample(list(zip(trainingData, trainingLabels)), newLength))
+    start = time.time()
+    classifier.train(slicedTrainingData, slicedTrainingLabels, validationData, validationLabels)
+    end = time.time()
+    trainingTime[itr-1] = end-start
+    print "Validating..."
+    guesses = classifier.classify(validationData)
+    correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
+    print "Testing..."
+    guesses = classifier.classify(testData)
+    correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
+    acc[itr-1] = correct
+    #analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  avgTime = float(sum(trainingTime)/len(trainingTime))
+  print "It took an average of",avgTime,"to train the algorithm with 40 percent data"
+  mean = float(sum(acc)/len(acc))
+  standardDev = numpy.std(acc)
+  print "The average prediction score is",mean,"%"
+  print "The standard deviation is",standardDev
 
-  print "Training 50%"
-  newLength = int(0.5 * len(trainingData))
-  slicedTrainingData = trainingData[0:newLength]
-  slicedTrainingLabels = trainingLabels[0:newLength]
-  slicedValidationData = validationData[0:newLength]
-  slicedValidationLabels = validationLabels[0:newLength]
-  classifier.train(slicedTrainingData, slicedTrainingLabels, slicedValidationData, slicedValidationLabels)
-  print "Validating 50%"
-  guesses = classifier.classify(slicedValidationData)
-  correct = [guesses[i] == slicedValidationLabels[i] for i in range(len(slicedValidationLabels))].count(True)
-  print str(correct), ("correct out of " + str(len(slicedValidationLabels)) + " (%.1f%%).") % (100.0 * correct / len(slicedValidationLabels))
-  print "Testing..."
-  guesses = classifier.classify(testData)
-  correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
-  print str(correct), ("correct out of " + str(len(testLabels)) + " (%.1f%%).") % (100.0 * correct / len(testLabels))
-  analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  print "Training the dataset using 50 percent of the random data"
+  acc = [0,0,0,0,0]
+  trainingTime = [0,0,0,0,0]
+  for itr in range(1,6):
+    print "Iteration number",itr
+    newLength = int(0.5 * len(trainingData))
+    slicedTrainingData, slicedTrainingLabels = zip(*random.sample(list(zip(trainingData, trainingLabels)), newLength))
+    start = time.time()
+    classifier.train(slicedTrainingData, slicedTrainingLabels, validationData, validationLabels)
+    end = time.time()
+    trainingTime[itr-1] = end-start
+    print "Validating..."
+    guesses = classifier.classify(validationData)
+    correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
+    print "Testing..."
+    guesses = classifier.classify(testData)
+    correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
+    acc[itr-1] = correct
+    #analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  avgTime = float(sum(trainingTime)/len(trainingTime))
+  print "It took an average of",avgTime,"to train the algorithm with 50 percent data"
+  mean = float(sum(acc)/len(acc))
+  standardDev = numpy.std(acc)
+  print "The average prediction score is",mean,"%"
+  print "The standard deviation is",standardDev
 
-  print "Training 60%"
-  newLength = int(0.6 * len(trainingData))
-  slicedTrainingData = trainingData[0:newLength]
-  slicedTrainingLabels = trainingLabels[0:newLength]
-  slicedValidationData = validationData[0:newLength]
-  slicedValidationLabels = validationLabels[0:newLength]
-  classifier.train(slicedTrainingData, slicedTrainingLabels, slicedValidationData, slicedValidationLabels)
-  print "Validating 60%"
-  guesses = classifier.classify(slicedValidationData)
-  correct = [guesses[i] == slicedValidationLabels[i] for i in range(len(slicedValidationLabels))].count(True)
-  print str(correct), ("correct out of " + str(len(slicedValidationLabels)) + " (%.1f%%).") % (100.0 * correct / len(slicedValidationLabels))
-  print "Testing..."
-  guesses = classifier.classify(testData)
-  correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
-  print str(correct), ("correct out of " + str(len(testLabels)) + " (%.1f%%).") % (100.0 * correct / len(testLabels))
-  analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  print "Training the dataset using 60 percent of the random data"
+  acc = [0,0,0,0,0]
+  trainingTime = [0,0,0,0,0]
+  for itr in range(1,6):
+    print "Iteration number",itr
+    newLength = int(0.6 * len(trainingData))
+    slicedTrainingData, slicedTrainingLabels = zip(*random.sample(list(zip(trainingData, trainingLabels)), newLength))
+    start = time.time()
+    classifier.train(slicedTrainingData, slicedTrainingLabels, validationData, validationLabels)
+    end = time.time()
+    trainingTime[itr-1] = end-start
+    print "Validating..."
+    guesses = classifier.classify(validationData)
+    correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
+    print "Testing..."
+    guesses = classifier.classify(testData)
+    correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
+    acc[itr-1] = correct
+    #analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  avgTime = float(sum(trainingTime)/len(trainingTime))
+  print "It took an average of",avgTime,"to train the algorithm with 60 percent data"
+  mean = float(sum(acc)/len(acc))
+  standardDev = numpy.std(acc)
+  print "The average prediction score is",mean,"%"
+  print "The standard deviation is",standardDev
 
-  print "Training 70%"
-  newLength = int(0.7 * len(trainingData))
-  slicedTrainingData = trainingData[0:newLength]
-  slicedTrainingLabels = trainingLabels[0:newLength]
-  slicedValidationData = validationData[0:newLength]
-  slicedValidationLabels = validationLabels[0:newLength]
-  classifier.train(slicedTrainingData, slicedTrainingLabels, slicedValidationData, slicedValidationLabels)
-  print "Validating 70%"
-  guesses = classifier.classify(slicedValidationData)
-  correct = [guesses[i] == slicedValidationLabels[i] for i in range(len(slicedValidationLabels))].count(True)
-  print str(correct), ("correct out of " + str(len(slicedValidationLabels)) + " (%.1f%%).") % (100.0 * correct / len(slicedValidationLabels))
-  print "Testing..."
-  guesses = classifier.classify(testData)
-  correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
-  print str(correct), ("correct out of " + str(len(testLabels)) + " (%.1f%%).") % (100.0 * correct / len(testLabels))
-  analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  print "Training the dataset using 70 percent of the random data"
+  acc = [0,0,0,0,0]
+  trainingTime = [0,0,0,0,0]
+  for itr in range(1,6):
+    print "Iteration number",itr
+    newLength = int(0.7 * len(trainingData))
+    slicedTrainingData, slicedTrainingLabels = zip(*random.sample(list(zip(trainingData, trainingLabels)), newLength))
+    start = time.time()
+    classifier.train(slicedTrainingData, slicedTrainingLabels, validationData, validationLabels)
+    end = time.time()
+    trainingTime[itr-1] = end-start
+    print "Validating..."
+    guesses = classifier.classify(validationData)
+    correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
+    print "Testing..."
+    guesses = classifier.classify(testData)
+    correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
+    acc[itr-1] = correct
+    #analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  avgTime = float(sum(trainingTime)/len(trainingTime))
+  print "It took an average of",avgTime,"to train the algorithm with 70 percent data"
+  mean = float(sum(acc)/len(acc))
+  standardDev = numpy.std(acc)
+  print "The average prediction score is",mean,"%"
+  print "The standard deviation is",standardDev
 
-  print "Training 80%"
-  newLength = int(0.8 * len(trainingData))
-  slicedTrainingData = trainingData[0:newLength]
-  slicedTrainingLabels = trainingLabels[0:newLength]
-  slicedValidationData = validationData[0:newLength]
-  slicedValidationLabels = validationLabels[0:newLength]
-  classifier.train(slicedTrainingData, slicedTrainingLabels, slicedValidationData, slicedValidationLabels)
-  print "Validating 80%"
-  guesses = classifier.classify(slicedValidationData)
-  correct = [guesses[i] == slicedValidationLabels[i] for i in range(len(slicedValidationLabels))].count(True)
-  print str(correct), ("correct out of " + str(len(slicedValidationLabels)) + " (%.1f%%).") % (100.0 * correct / len(slicedValidationLabels))
-  print "Testing..."
-  guesses = classifier.classify(testData)
-  correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
-  print str(correct), ("correct out of " + str(len(testLabels)) + " (%.1f%%).") % (100.0 * correct / len(testLabels))
-  analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  print "Training the dataset using 80 percent of the random data"
+  acc = [0,0,0,0,0]
+  trainingTime = [0,0,0,0,0]
+  for itr in range(1,6):
+    print "Iteration number",itr
+    newLength = int(0.8 * len(trainingData))
+    slicedTrainingData, slicedTrainingLabels = zip(*random.sample(list(zip(trainingData, trainingLabels)), newLength))
+    start = time.time()
+    classifier.train(slicedTrainingData, slicedTrainingLabels, validationData, validationLabels)
+    end = time.time()
+    trainingTime[itr-1] = end-start
+    print "Validating..."
+    guesses = classifier.classify(validationData)
+    correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
+    print "Testing..."
+    guesses = classifier.classify(testData)
+    correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
+    acc[itr-1] = correct
+    #analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  avgTime = float(sum(trainingTime)/len(trainingTime))
+  print "It took an average of",avgTime,"to train the algorithm with 80 percent data"
+  mean = float(sum(acc)/len(acc))
+  standardDev = numpy.std(acc)
+  print "The average prediction score is",mean,"%"
+  print "The standard deviation is",standardDev
 
-  print "Training 90%"
-  newLength = int(0.9 * len(trainingData))
-  slicedTrainingData = trainingData[0:newLength]
-  slicedTrainingLabels = trainingLabels[0:newLength]
-  slicedValidationData = validationData[0:newLength]
-  slicedValidationLabels = validationLabels[0:newLength]
-  classifier.train(slicedTrainingData, slicedTrainingLabels, slicedValidationData, slicedValidationLabels)
-  print "Validating 90%"
-  guesses = classifier.classify(slicedValidationData)
-  correct = [guesses[i] == slicedValidationLabels[i] for i in range(len(slicedValidationLabels))].count(True)
-  print str(correct), ("correct out of " + str(len(slicedValidationLabels)) + " (%.1f%%).") % (100.0 * correct / len(slicedValidationLabels))
-  print "Testing..."
-  guesses = classifier.classify(testData)
-  correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
-  print str(correct), ("correct out of " + str(len(testLabels)) + " (%.1f%%).") % (100.0 * correct / len(testLabels))
-  analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  print "Training the dataset using 90 percent of the random data"
+  acc = [0,0,0,0,0]
+  trainingTime = [0,0,0,0,0]
+  for itr in range(1,6):
+    print "Iteration number",itr
+    newLength = int(0.9 * len(trainingData))
+    slicedTrainingData, slicedTrainingLabels = zip(*random.sample(list(zip(trainingData, trainingLabels)), newLength))
+    start = time.time()
+    classifier.train(slicedTrainingData, slicedTrainingLabels, validationData, validationLabels)
+    end = time.time()
+    trainingTime[itr-1] = end-start
+    print "Validating..."
+    guesses = classifier.classify(validationData)
+    correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
+    print "Testing..."
+    guesses = classifier.classify(testData)
+    correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
+    acc[itr-1] = correct
+    #analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  avgTime = float(sum(trainingTime)/len(trainingTime))
+  print "It took an average of",avgTime,"to train the algorithm with 90 percent data"
+  mean = float(sum(acc)/len(acc))
+  standardDev = numpy.std(acc)
+  print "The average prediction score is",mean,"%"
+  print "The standard deviation is",standardDev
 
-  print "Training 100%"
-  classifier.train(trainingData, trainingLabels, validationData, validationLabels)
-  print "Validating 100%"
-  guesses = classifier.classify(validationData)
-  correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
-  print str(correct), ("correct out of " + str(len(validationLabels)) + " (%.1f%%).") % (100.0 * correct / len(validationLabels))
-  print "Testing..."
-  guesses = classifier.classify(testData)
-  correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
-  print str(correct), ("correct out of " + str(len(testLabels)) + " (%.1f%%).") % (100.0 * correct / len(testLabels))
-  analysis(classifier, guesses, testLabels, testData, rawTestData, printImage) 
-
-  
+  print "Training the dataset using 100 percent of the random data"
+  acc = [0,0,0,0,0]
+  trainingTime = [0,0,0,0,0]
+  for itr in range(1,6):
+    print "Iteration number",itr
+    start = time.time()
+    classifier.train(trainingData, trainingLabels, validationData, validationLabels)
+    end = time.time()
+    trainingTime[itr-1] = end-start
+    print "Validating..."
+    guesses = classifier.classify(validationData)
+    correct = [guesses[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
+    print "Testing..."
+    guesses = classifier.classify(testData)
+    correct = [guesses[i] == testLabels[i] for i in range(len(testLabels))].count(True) # correct is the count of True values in list
+    acc[itr-1] = correct
+    #analysis(classifier, guesses, testLabels, testData, rawTestData, printImage)
+  avgTime = float(sum(trainingTime)/len(trainingTime))
+  print "It took an average of",avgTime,"to train the algorithm with 100 percent data"
+  mean = float(sum(acc)/len(acc))
+  standardDev = numpy.std(acc)
+  print "The average prediction score is",mean,"%"
+  print "The standard deviation is",standardDev
   
   # do odds ratio computation if specified at command line
   if((options.odds) & (options.classifier == "naiveBayes" or (options.classifier == "nb")) ):
