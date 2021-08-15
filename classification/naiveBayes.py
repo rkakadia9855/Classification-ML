@@ -108,12 +108,12 @@ class NaiveBayesClassifier(classificationMethod.ClassificationMethod):
       self.finalConditionalProbability = featureEqualsOne
 
       # This is for autotune. It keeps track of which k value produced best accuracy
-      predictions = self.classify(validationData)
-      accuracyScore =  [predictions[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
-      bestParams = (featureEqualsOne, k) if accuracyScore > mostAccurateK else bestParams
+      predictionResults = self.classify(validationData)
+      accuracyScore =  [predictionResults[i] == validationLabels[i] for i in range(len(validationLabels))].count(True)
+      optimalParameters = (featureEqualsOne, k) if accuracyScore > mostAccurateK else optimalParameters
       mostAccurateK = accuracyScore if accuracyScore > mostAccurateK else mostAccurateK
 
-    self.finalConditionalProbability, self.k = bestParams
+    self.finalConditionalProbability, self.k = optimalParameters
     
     
         
