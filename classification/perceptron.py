@@ -49,7 +49,19 @@ class PerceptronClassifier:
       print "Starting iteration ", iteration, "..."
       for i in range(len(trainingData)):
         "*** YOUR CODE HERE ***"
-        print len(trainingData)     
+        scoreKeeper = util.Counter() # Keeps track of scores for each y'
+        for crnt in self.legalLabels:
+          scoreKeeper[crnt] = None
+        for label in self.legalLabels:
+          temp = trainingData[i] * self.weights[label]
+          # if the calculated score is greater then score stored for that y', it is replaced
+          if temp > scoreKeeper[label] or scoreKeeper[label] is None: 
+            scoreKeeper[label] = temp
+        # Get the y' with max score, and check if that y' matches with y
+        if scoreKeeper.argMax() != trainingLabels[i]:
+          self.weights[trainingLabels[i]] += trainingData[i]
+          self.weights[scoreKeeper.argMax()] -= trainingData[i]
+
           
     
   def classify(self, data ):
