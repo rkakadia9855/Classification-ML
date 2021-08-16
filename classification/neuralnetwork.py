@@ -1,25 +1,22 @@
-# perceptron.py
+# neuralnetwork.py
 # -------------
-# Licensing Information: Please do not distribute or publish solutions to this
-# project. You are free to use and extend these projects for educational
-# purposes. The Pacman AI projects were developed at UC Berkeley, primarily by
-# John DeNero (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
-# For more info, see http://inst.eecs.berkeley.edu/~cs188/sp09/pacman.html
 
-# Perceptron implementation
+# Neural network implementation
 import util
+import math
+import numpy
 PRINT = True
 
-class PerceptronClassifier:
+class NeuralNetworkClassifier:
   """
-  Perceptron classifier.
+  neural network classifier.
   
   Note that the variable 'datum' in this code refers to a counter of features
   (not to a raw samples.Datum).
   """
   def __init__( self, legalLabels, max_iterations):
     self.legalLabels = legalLabels
-    self.type = "perceptron"
+    self.type = "neuralnetwork"
     self.max_iterations = max_iterations
     self.weights = {}
     for label in legalLabels:
@@ -28,10 +25,15 @@ class PerceptronClassifier:
   def setWeights(self, weights):
     assert len(weights) == len(self.legalLabels)
     self.weights == weights
+
+  def sigmoidFunction(self, x):
+    tempval = 1 + numpy.exp(-x)
+    tempval = 1/tempval
+    return tempval
       
   def train( self, trainingData, trainingLabels, validationData, validationLabels ):
     """
-    The training loop for the perceptron passes through the training data several
+    The training loop for the neural network passes through the training data several
     times and updates the weight vector for each label based on classification errors.
     See the project description for details. 
     
@@ -46,22 +48,26 @@ class PerceptronClassifier:
     # THE AUTOGRADER WILL LIKELY DEDUCT POINTS.
     
     for iteration in range(self.max_iterations):
-      print "Starting iteration ", iteration, "..."
+      print "Starting iteration ", iteration, "..." 
       for i in range(len(trainingData)):
         "*** YOUR CODE HERE ***"
+          
         scoreKeeper = util.Counter() # Keeps track of scores for each y'
         for crnt in self.legalLabels:
           scoreKeeper[crnt] = None
+          
         for label in self.legalLabels:
           temp = trainingData[i] * self.weights[label]
+          temp = self.sigmoidFunction(temp)
           # if the calculated score is greater then score stored for that y', it is replaced
           if temp > scoreKeeper[label] or scoreKeeper[label] is None: 
-            scoreKeeper[label] = temp
+            scoreKeeper[label] = temp 
 
-        # Get the y' with max score, and check if that y' matches with y
         if scoreKeeper.argMax() != trainingLabels[i]:
           self.weights[trainingLabels[i]] += trainingData[i]
           self.weights[scoreKeeper.argMax()] -= trainingData[i]
+
+        # Get the y' with max score, and check if that y' matches with y
 
           
     

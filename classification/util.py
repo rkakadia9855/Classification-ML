@@ -171,6 +171,16 @@ class Counter(dict):
     values = [x[1] for x in all]
     maxIndex = values.index(max(values))
     return all[maxIndex][0]
+
+  def argMin(self):
+    """
+    Returns the key with the highest value.
+    """
+    if len(self.keys()) == 0: return None
+    all = self.items()
+    values = [x[1] for x in all]
+    minIndex = values.index(min(values))
+    return all[minIndex][0]
   
   def sortedKeys(self):
     """
